@@ -13,6 +13,21 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <PreferNativeArm64>true</PreferNativeArm64>
     <Deterministic>true</Deterministic>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -91,6 +106,60 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormBangDiem_GiangVien.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormBangDiem_GiangVien.Designer.cs">
+      <DependentUpon>FormBangDiem_GiangVien.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormDangKyHocPhan_PDT.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormDangKyHocPhan_PDT.Designer.cs">
+      <DependentUpon>FormDangKyHocPhan_PDT.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormDangKyHocPhan_SV.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormDangKyHocPhan_SV.Designer.cs">
+      <DependentUpon>FormDangKyHocPhan_SV.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMain.Designer.cs">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormMomon_PDT_FULLCRUD.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMomon_PDT_FULLCRUD.Designer.cs">
+      <DependentUpon>FormMomon_PDT_FULLCRUD.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormMomon_ReadOnly.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMomon_ReadOnly.Designer.cs">
+      <DependentUpon>FormMomon_ReadOnly.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormMomon_SV_ReadOnly.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMomon_SV_ReadOnly.Designer.cs">
+      <DependentUpon>FormMomon_SV_ReadOnly.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormMomon_TRGDV_ViewOnly.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormMomon_TRGDV_ViewOnly.Designer.cs">
+      <DependentUpon>FormMomon_TRGDV_ViewOnly.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormNhanVienCaNhan.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormNhanVienCaNhan.Designer.cs">
+      <DependentUpon>FormNhanVienCaNhan.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormAlterUser.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -127,11 +196,53 @@
     <Compile Include="FormGrantRoleToUser.Designer.cs">
       <DependentUpon>FormGrantRoleToUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormQuanLyBangDiem_PKT.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormQuanLyBangDiem_PKT.Designer.cs">
+      <DependentUpon>FormQuanLyBangDiem_PKT.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormQuanLySinhVien_PCTSV.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormQuanLySinhVien_PCTSV.Designer.cs">
+      <DependentUpon>FormQuanLySinhVien_PCTSV.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormRenameRole.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FormRenameRole.Designer.cs">
       <DependentUpon>FormRenameRole.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormSinhVien_CaNhan.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormSinhVien_CaNhan.Designer.cs">
+      <DependentUpon>FormSinhVien_CaNhan.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormSinhVien_GV_ReadOnly.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormSinhVien_GV_ReadOnly.Designer.cs">
+      <DependentUpon>FormSinhVien_GV_ReadOnly.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormTCHCQuanLyNhanVien.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormTCHCQuanLyNhanVien.Designer.cs">
+      <DependentUpon>FormTCHCQuanLyNhanVien.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormTinhTrangHocVu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormTinhTrangHocVu.Designer.cs">
+      <DependentUpon>FormTinhTrangHocVu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormTruongDonViQuanLy.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormTruongDonViQuanLy.Designer.cs">
+      <DependentUpon>FormTruongDonViQuanLy.cs</DependentUpon>
     </Compile>
     <Compile Include="FormViewRolePrivileges.cs">
       <SubType>Form</SubType>
@@ -155,6 +266,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormMain.resx">
+      <DependentUpon>FormMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormNhanVienCaNhan.resx">
+      <DependentUpon>FormNhanVienCaNhan.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormAlterUser.resx">
       <DependentUpon>FormAlterUser.cs</DependentUpon>
@@ -186,6 +303,9 @@
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Program.resx">
+      <DependentUpon>Program.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -214,6 +334,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
