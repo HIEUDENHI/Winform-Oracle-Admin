@@ -62,7 +62,7 @@ namespace OracleAdminWinForms
                 });
             }
 
-            if (role == "GV" || role == "TRGĐV")
+            if (role == "GV" )
             {
                 AddSidebarButton("Thông tin giảng dạy", () =>
                 {
@@ -75,6 +75,13 @@ namespace OracleAdminWinForms
                 AddSidebarButton("Bảng điểm lớp dạy", () =>
                 {
                     LoadForm(new FormBangDiem_GiangVien(conn));
+                });
+            }
+            if (role == "TRGĐV")
+            {
+                AddSidebarButton("Thông tin giảng dạy", () =>
+                {
+                    LoadForm(new FormMomon_ReadOnly(conn, username, role));
                 });
             }
 

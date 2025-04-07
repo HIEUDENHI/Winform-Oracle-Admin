@@ -27,7 +27,7 @@ namespace OracleAdminWinForms
         {
             try
             {
-                string query = "SELECT * FROM MOMON";
+                string query = "SELECT * FROM VW_MOMON_SV";
                 OracleDataAdapter adapter = new OracleDataAdapter(query, conn);
                 DataTable dt = new DataTable();
                 adapter.Fill(dt);
