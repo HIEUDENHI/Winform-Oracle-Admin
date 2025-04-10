@@ -8,6 +8,7 @@ partial class FormDangKyHocPhan_SV
     private DataGridView dgvDangKy;
     private Button btnThem;
     private Button btnXoa;
+    private Button btnCapNhat;
     private Button btnTaiLai;
     private Label lblTitle;
     private TextBox txtMaMon;
@@ -24,6 +25,7 @@ partial class FormDangKyHocPhan_SV
         this.dgvDangKy = new DataGridView();
         this.btnThem = new Button();
         this.btnXoa = new Button();
+        this.btnCapNhat = new Button();
         this.btnTaiLai = new Button();
         this.lblTitle = new Label();
         this.txtMaMon = new TextBox();
@@ -68,13 +70,17 @@ partial class FormDangKyHocPhan_SV
         this.btnXoa.Location = new Point(340, 370);
         this.btnXoa.Click += new EventHandler(this.btnXoa_Click);
 
+        this.btnCapNhat.Text = "Cập nhật";
+        this.btnCapNhat.Location = new Point(440, 370);
+        this.btnCapNhat.Click += new EventHandler(this.btnCapNhat_Click);
+
         this.btnTaiLai.Text = "Tải lại";
-        this.btnTaiLai.Location = new Point(440, 370);
+        this.btnTaiLai.Location = new Point(540, 370);
         this.btnTaiLai.Click += new EventHandler(this.btnTaiLai_Click);
 
         this.ClientSize = new Size(800, 420);
         this.Controls.AddRange(new Control[] {
-            lblTitle, dgvDangKy, txtMaMon, btnThem, btnXoa, btnTaiLai
+            lblTitle, dgvDangKy, txtMaMon, btnThem, btnXoa, btnCapNhat, btnTaiLai
         });
 
         this.Text = "Đăng ký học phần - Sinh viên";
