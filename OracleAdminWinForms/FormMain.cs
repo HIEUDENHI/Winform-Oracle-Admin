@@ -123,6 +123,12 @@ namespace OracleAdminWinForms
                 });
             }
 
+            AddSidebarButton("Xem thông báo", () =>
+            {
+                LoadForm(new FormThongBao(conn, username));
+            });
+
+
             AddSidebarButton("Đăng xuất", () =>
             {
                 this.Hide();

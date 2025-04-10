@@ -27,7 +27,7 @@ namespace OracleAdminWinForms
         {
             try
             {
-                string query = "SELECT MATB, NOIDUNG, NGAYGUI FROM ADMIN_OLS.THONGBAO ORDER BY NGAYGUI DESC";
+                string query = "SELECT MATB, NOIDUNG, NGAYGUI FROM ADMIN_OLS.THONGBAO ";
                 OracleCommand cmd = new OracleCommand(query, conn);
                 OracleDataAdapter adapter = new OracleDataAdapter(cmd);
                 DataTable dt = new DataTable();
