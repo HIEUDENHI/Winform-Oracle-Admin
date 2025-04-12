@@ -62,7 +62,7 @@ namespace OracleAdminWinForms
                 });
             }
 
-            if (role == "GV" )
+            if (role == "GV")
             {
                 AddSidebarButton("Thông tin giảng dạy", () =>
                 {
@@ -122,11 +122,13 @@ namespace OracleAdminWinForms
                     LoadForm(new FormQuanLyBangDiem_PKT(conn, username));
                 });
             }
-
-            AddSidebarButton("Xem thông báo", () =>
+            if (role == "OLS_USER")
             {
-                LoadForm(new FormThongBao(conn, username));
-            });
+                AddSidebarButton("Xem thông báo", () =>
+                {
+                    LoadForm(new FormThongBao(conn, username));
+                });
+            }
 
 
             AddSidebarButton("Đăng xuất", () =>

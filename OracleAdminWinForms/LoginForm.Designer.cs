@@ -33,17 +33,17 @@
             // 
             // txtUsername
             // 
-            this.txtUsername.Location = new System.Drawing.Point(205, 58);
+            this.txtUsername.Location = new System.Drawing.Point(258, 63);
             this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(176, 26);
+            this.txtUsername.Size = new System.Drawing.Size(176, 31);
             this.txtUsername.TabIndex = 0;
             // 
             // txtPassword
             // 
-            this.txtPassword.Location = new System.Drawing.Point(205, 100);
+            this.txtPassword.Location = new System.Drawing.Point(258, 100);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '*';
-            this.txtPassword.Size = new System.Drawing.Size(176, 26);
+            this.txtPassword.Size = new System.Drawing.Size(176, 31);
             this.txtPassword.TabIndex = 1;
             // 
             // cmbRole
@@ -58,14 +58,14 @@
             "NV PĐT",
             "NV PKT",
             "NV CTSV"});
-            this.cmbRole.Location = new System.Drawing.Point(205, 142);
+            this.cmbRole.Location = new System.Drawing.Point(258, 142);
             this.cmbRole.Name = "cmbRole";
-            this.cmbRole.Size = new System.Drawing.Size(176, 28);
+            this.cmbRole.Size = new System.Drawing.Size(176, 33);
             this.cmbRole.TabIndex = 2;
             // 
             // btnLogin
             // 
-            this.btnLogin.Location = new System.Drawing.Point(205, 190);
+            this.btnLogin.Location = new System.Drawing.Point(249, 190);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(85, 36);
             this.btnLogin.TabIndex = 3;
@@ -77,7 +77,7 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(118, 61);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(87, 20);
+            this.label1.Size = new System.Drawing.Size(116, 25);
             this.label1.TabIndex = 4;
             this.label1.Text = "Username:";
             // 
@@ -86,7 +86,7 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(118, 103);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(82, 20);
+            this.label2.Size = new System.Drawing.Size(112, 25);
             this.label2.TabIndex = 5;
             this.label2.Text = "Password:";
             // 
@@ -95,7 +95,7 @@
             this.lblRole.AutoSize = true;
             this.lblRole.Location = new System.Drawing.Point(118, 145);
             this.lblRole.Name = "lblRole";
-            this.lblRole.Size = new System.Drawing.Size(97, 20);
+            this.lblRole.Size = new System.Drawing.Size(134, 25);
             this.lblRole.TabIndex = 6;
             this.lblRole.Text = "Chọn vai trò:";
             // 
