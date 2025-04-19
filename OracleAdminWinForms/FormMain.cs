@@ -79,6 +79,11 @@ namespace OracleAdminWinForms
             }
             if (role == "TRGĐV")
             {
+                AddSidebarButton("Thông tin Nhân Viên", () =>
+                {
+                    LoadForm(new FormTRGDV_XemNhanVien(conn, username));
+                });
+
                 AddSidebarButton("Thông tin giảng dạy", () =>
                 {
                     LoadForm(new FormMomon_ReadOnly(conn, username, role));

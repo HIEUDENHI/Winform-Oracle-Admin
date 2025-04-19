@@ -48,14 +48,10 @@ namespace OracleAdminWinForms
                 return;
             }
 
-            string connectionString;
+            string connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));";
             if (username.Equals("SYS", StringComparison.OrdinalIgnoreCase))
             {
-                connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=15211))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));DBA Privilege=SYSDBA;";
-            }
-            else
-            {
-                connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=15211))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));";
+                connectionString += "DBA Privilege=SYSDBA;";
             }
 
             try
@@ -67,8 +63,7 @@ namespace OracleAdminWinForms
 
                 if (selectedRole == "SV")
                 {
-                    // ✅ Check vai trò sinh viên
-                    using (var cmd = new OracleCommand("SELECT 'SV' FROM SYSTEM.SINHVIEN WHERE MASV = :id", conn))
+                    using (var cmd = new OracleCommand("SELECT 'SV' FROM SINHVIEN WHERE MASV = :id", conn))
                     {
                         cmd.Parameters.Add("id", OracleDbType.Varchar2).Value = username;
                         object result = cmd.ExecuteScalar();
@@ -77,8 +72,7 @@ namespace OracleAdminWinForms
                 }
                 else
                 {
-                    // ✅ Check vai trò nhân viên
-                    using (var cmd = new OracleCommand("SELECT VAITRO FROM SYSTEM.NHANVIEN WHERE MANV = :id", conn))
+                    using (var cmd = new OracleCommand("SELECT VAITRO FROM NHANVIEN WHERE MANV = :id", conn))
                     {
                         cmd.Parameters.Add("id", OracleDbType.Varchar2).Value = username;
                         object result = cmd.ExecuteScalar();
@@ -93,14 +87,27 @@ namespace OracleAdminWinForms
                     return;
                 }
 
-                if (!vaiTroFromDb.Equals(selectedRole, StringComparison.OrdinalIgnoreCase))
+                // Chuẩn hóa vai trò từ DB để so sánh với selectedRole
+                string normalizedRoleFromDb = vaiTroFromDb.ToUpper().Trim();
+                if (normalizedRoleFromDb == "SV" && selectedRole == "SV")
+                {
+                    // Sinh viên hợp lệ
+                }
+                else if (normalizedRoleFromDb == selectedRole ||
+                         (normalizedRoleFromDb == "NV PĐT" && selectedRole == "NV PĐT") ||
+                         (normalizedRoleFromDb == "NV PKT" && selectedRole == "NV PKT") ||
+                         (normalizedRoleFromDb == "NV PCTSV" && selectedRole == "NV PCTSV") ||
+                         (normalizedRoleFromDb == "NV TCHC" && selectedRole == "NV TCHC"))
+                {
+                    // Nhân viên hợp lệ
+                }
+                else
                 {
                     MessageBox.Show($"Bạn chọn vai trò [{selectedRole}], nhưng hệ thống ghi nhận là [{vaiTroFromDb}].");
                     conn.Close();
                     return;
                 }
 
-                // ✅ Đăng nhập thành công
                 UserConnection = conn;
                 this.DialogResult = DialogResult.OK;
                 this.Close();

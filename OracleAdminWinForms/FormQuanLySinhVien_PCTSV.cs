@@ -32,7 +32,7 @@ namespace OracleAdminWinForms
                 DataTable dt = new DataTable();
                 adapter.Fill(dt);
 
-                // 👇 Thêm dòng trống cuối cùng để người dùng có thể nhập mới
+                // Thêm một dòng trống cuối cùng để người dùng có thể nhập mới
                 dt.Rows.Add(dt.NewRow());
 
                 dgvSinhVien.DataSource = dt;
@@ -49,7 +49,7 @@ namespace OracleAdminWinForms
             {
                 if (dgvSinhVien.Rows.Count == 0) return;
 
-                DataGridViewRow row = dgvSinhVien.Rows[dgvSinhVien.Rows.Count - 1]; // dòng cuối
+                DataGridViewRow row = dgvSinhVien.Rows[dgvSinhVien.Rows.Count - 1]; // Dòng cuối
                 string masv = row.Cells["MASV"].Value?.ToString()?.Trim();
 
                 if (string.IsNullOrEmpty(masv))
@@ -102,7 +102,7 @@ namespace OracleAdminWinForms
         {
             try
             {
-                if (dgvSinhVien.CurrentRow == null) return;
+                if (dgvSinhVien.CurrentRow == null || dgvSinhVien.CurrentRow.IsNewRow) return;
 
                 DataGridViewRow row = dgvSinhVien.CurrentRow;
                 string masv = row.Cells["MASV"].Value?.ToString()?.Trim();
@@ -150,7 +150,7 @@ namespace OracleAdminWinForms
         {
             try
             {
-                if (dgvSinhVien.CurrentRow == null) return;
+                if (dgvSinhVien.CurrentRow == null || dgvSinhVien.CurrentRow.IsNewRow) return;
 
                 DataGridViewRow row = dgvSinhVien.CurrentRow;
                 string masv = row.Cells["MASV"].Value?.ToString()?.Trim();

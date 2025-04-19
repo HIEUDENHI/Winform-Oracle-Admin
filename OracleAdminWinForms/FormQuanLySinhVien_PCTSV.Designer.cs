@@ -54,6 +54,7 @@
             this.dgvSinhVien.Size = new System.Drawing.Size(980, 420);
             this.dgvSinhVien.TabIndex = 1;
             this.dgvSinhVien.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvSinhVien.AllowUserToAddRows = false; // Tắt tự động thêm dòng trống
 
             // 
             // btnThem

@@ -60,10 +60,9 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "FormMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Team 05 - Quản lý giảng dạy";
+            this.Text = "ATBM-02 - Quản lý giảng dạy";
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.ResumeLayout(false);
-
         }
     }
 }

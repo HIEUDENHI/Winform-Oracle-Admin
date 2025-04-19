@@ -238,6 +238,12 @@
     <Compile Include="FormTinhTrangHocVu.Designer.cs">
       <DependentUpon>FormTinhTrangHocVu.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormTRGDV_XemNhanVien.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormTRGDV_XemNhanVien.Designer.cs">
+      <DependentUpon>FormTRGDV_XemNhanVien.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormTruongDonViQuanLy.cs">
       <SubType>Form</SubType>
     </Compile>
