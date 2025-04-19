@@ -9,6 +9,7 @@ namespace OracleAdminWinForms
         public string Username { get; private set; }
         public string RoleSelected { get; private set; }
         public OracleConnection UserConnection { get; private set; }
+        public string OlsLabel { get; private set; } // Optional: Lưu nhãn OLS nếu cần
 
         public LoginForm()
         {
@@ -20,6 +21,7 @@ namespace OracleAdminWinForms
             cmbRole.Items.Clear();
             cmbRole.Items.AddRange(new string[]
             {
+                "Admin",      // Thêm vai trò Admin
                 "NVCB",
                 "GV",
                 "TRGĐV",
@@ -27,7 +29,8 @@ namespace OracleAdminWinForms
                 "NV TCHC",
                 "NV PĐT",
                 "NV PCTSV",
-                "SV" // ✅ đã thêm sinh viên vào danh sách
+                "SV",
+                "OLS_USER"    // Vai trò OLS_USER
             });
 
             cmbRole.SelectedIndex = 0;
@@ -35,10 +38,11 @@ namespace OracleAdminWinForms
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            string username = txtUsername.Text.Trim().ToUpper();
+            string username = txtUsername.Text.Trim();
             string password = txtPassword.Text;
             string selectedRole = cmbRole.SelectedItem?.ToString();
 
+            // Lưu thông tin vào thuộc tính của form
             Username = username;
             RoleSelected = selectedRole;
 
@@ -48,73 +52,151 @@ namespace OracleAdminWinForms
                 return;
             }
 
-            string connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));";
-            if (username.Equals("SYS", StringComparison.OrdinalIgnoreCase))
+            // Nếu người dùng chọn vai trò Admin thì dùng đoạn mã đăng nhập sau:
+            if (selectedRole.Equals("Admin", StringComparison.OrdinalIgnoreCase))
             {
-                connectionString += "DBA Privilege=SYSDBA;";
-            }
+                string connectionString;
+                // Nếu tài khoản là SYS thì thêm tham số DBA Privilege
+                if (username.Equals("sys", StringComparison.OrdinalIgnoreCase))
+                {
+                    connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));DBA Privilege=SYSDBA;";
+                }
+                else
+                {
+                    connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));";
+                }
 
+                try
+                {
+                    OracleConnection conn = new OracleConnection(connectionString);
+                    conn.Open(); // Kiểm tra đăng nhập
+                    UserConnection = conn;
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Đăng nhập thất bại: " + ex.Message);
+                }
+                return;
+            }
+            // Xử lý cho vai trò OLS_USER
+            else if (selectedRole.Equals("OLS_USER", StringComparison.OrdinalIgnoreCase))
+            {
+                string connectionString;
+                if (username.Equals("SYS", StringComparison.OrdinalIgnoreCase))
+                {
+                    connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));DBA Privilege=SYSDBA;";
+                }
+                else
+                {
+                    connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));";
+                }
+
+                try
+                {
+                    OracleConnection conn = new OracleConnection(connectionString);
+                    conn.Open();
+
+                    MessageBox.Show("Đăng nhập thành công với vai trò OLS_USER.");
+
+                    UserConnection = conn;
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Đăng nhập thất bại: " + ex.Message + "\nStack Trace: " + ex.StackTrace);
+                }
+                return;
+            }
+            else
+            {
+                // Đối với các vai trò còn lại: NVCB, GV, TRGĐV, NV PKT, NV TCHC, NV PĐT, NV PCTSV, SV
+                // Chuyển đổi username sang chữ hoa để so sánh
+                username = username.ToUpper();
+
+                string connectionString;
+                if (username.Equals("SYS", StringComparison.OrdinalIgnoreCase))
+                {
+                    connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));DBA Privilege=SYSDBA;";
+                }
+                else
+                {
+                    connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));";
+                }
+
+                try
+                {
+                    OracleConnection conn = new OracleConnection(connectionString);
+                    conn.Open();
+
+                    string vaiTroFromDb = null;
+
+                    if (selectedRole.Equals("SV", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Kiểm tra vai trò sinh viên
+                        using (var cmd = new OracleCommand("SELECT 'SV' FROM SYSTEM.SINHVIEN WHERE MASV = :id", conn))
+                        {
+                            cmd.Parameters.Add("id", OracleDbType.Varchar2).Value = username;
+                            var result = cmd.ExecuteScalar();
+                            vaiTroFromDb = result?.ToString();
+                        }
+                    }
+                    else
+                    {
+                        // Kiểm tra vai trò nhân viên
+                        using (var cmd = new OracleCommand("SELECT VAITRO FROM SYSTEM.NHANVIEN WHERE MANV = :id", conn))
+                        {
+                            cmd.Parameters.Add("id", OracleDbType.Varchar2).Value = username;
+                            var result = cmd.ExecuteScalar();
+                            vaiTroFromDb = result?.ToString();
+                        }
+                    }
+
+                    if (vaiTroFromDb == null)
+                    {
+                        MessageBox.Show("Không tìm thấy vai trò trong hệ thống.");
+                        conn.Close();
+                        return;
+                    }
+
+                    // So sánh vai trò người dùng chọn với vai trò ghi nhận trong cơ sở dữ liệu
+                    if (!vaiTroFromDb.Equals(selectedRole, StringComparison.OrdinalIgnoreCase))
+                    {
+                        MessageBox.Show($"Bạn chọn vai trò [{selectedRole}], nhưng hệ thống ghi nhận là [{vaiTroFromDb}].");
+                        conn.Close();
+                        return;
+                    }
+
+                    UserConnection = conn;
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Đăng nhập thất bại: " + ex.Message + "\nStack Trace: " + ex.StackTrace);
+                }
+            }
+        }
+
+        // Optional: Phương thức lấy nhãn OLS cho người dùng (nếu cần)
+        private string GetOlsLabel(OracleConnection conn, string username)
+        {
             try
             {
-                OracleConnection conn = new OracleConnection(connectionString);
-                conn.Open();
-
-                string vaiTroFromDb = null;
-
-                if (selectedRole == "SV")
+                using (var cmd = new OracleCommand("SELECT SA_USER_ADMIN.GET_USER_LABELS('THONGBAO_POLICY', :username) FROM DUAL", conn))
                 {
-                    using (var cmd = new OracleCommand("SELECT 'SV' FROM SINHVIEN WHERE MASV = :id", conn))
-                    {
-                        cmd.Parameters.Add("id", OracleDbType.Varchar2).Value = username;
-                        object result = cmd.ExecuteScalar();
-                        vaiTroFromDb = result?.ToString();
-                    }
+                    cmd.Parameters.Add("username", OracleDbType.Varchar2).Value = username;
+                    object result = cmd.ExecuteScalar();
+                    return result?.ToString() ?? "Unknown";
                 }
-                else
-                {
-                    using (var cmd = new OracleCommand("SELECT VAITRO FROM NHANVIEN WHERE MANV = :id", conn))
-                    {
-                        cmd.Parameters.Add("id", OracleDbType.Varchar2).Value = username;
-                        object result = cmd.ExecuteScalar();
-                        vaiTroFromDb = result?.ToString();
-                    }
-                }
-
-                if (vaiTroFromDb == null)
-                {
-                    MessageBox.Show("Không tìm thấy vai trò trong hệ thống.");
-                    conn.Close();
-                    return;
-                }
-
-                // Chuẩn hóa vai trò từ DB để so sánh với selectedRole
-                string normalizedRoleFromDb = vaiTroFromDb.ToUpper().Trim();
-                if (normalizedRoleFromDb == "SV" && selectedRole == "SV")
-                {
-                    // Sinh viên hợp lệ
-                }
-                else if (normalizedRoleFromDb == selectedRole ||
-                         (normalizedRoleFromDb == "NV PĐT" && selectedRole == "NV PĐT") ||
-                         (normalizedRoleFromDb == "NV PKT" && selectedRole == "NV PKT") ||
-                         (normalizedRoleFromDb == "NV PCTSV" && selectedRole == "NV PCTSV") ||
-                         (normalizedRoleFromDb == "NV TCHC" && selectedRole == "NV TCHC"))
-                {
-                    // Nhân viên hợp lệ
-                }
-                else
-                {
-                    MessageBox.Show($"Bạn chọn vai trò [{selectedRole}], nhưng hệ thống ghi nhận là [{vaiTroFromDb}].");
-                    conn.Close();
-                    return;
-                }
-
-                UserConnection = conn;
-                this.DialogResult = DialogResult.OK;
-                this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Đăng nhập thất bại: " + ex.Message);
+                MessageBox.Show("Không thể lấy nhãn OLS: " + ex.Message);
+                return "Unknown";
             }
         }
     }
