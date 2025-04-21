@@ -3,6 +3,7 @@ using System.Data;
 using System.Windows.Forms;
 using Oracle.ManagedDataAccess.Client;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace OracleAdminWinForms
 {
@@ -34,6 +35,14 @@ namespace OracleAdminWinForms
             Debug.WriteLine("Form2_Load started");
             LoadVaiTro();
             lblUserInfo.Text = $"Đăng nhập: {username} | Vai trò: {vaitro}";
+
+            if (!vaitro.Contains("NV") && !vaitro.Contains("GV") && vaitro != "TRGĐV")
+            {
+                MessageBox.Show("Chỉ nhân viên hoặc giảng viên mới được phép truy cập form này!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this.Close();
+                return;
+            }
+
             LoadNhanVienData();
             Debug.WriteLine("Form2_Load completed");
         }
@@ -43,7 +52,20 @@ namespace OracleAdminWinForms
             Debug.WriteLine("LoadVaiTro started");
             try
             {
-                using (var cmd = new OracleCommand("SELECT VAITRO FROM NHANVIEN WHERE UPPER(MANV) = :username", conn))
+                if (conn.State != ConnectionState.Open)
+                {
+                    conn.Open();
+                    Debug.WriteLine("Connection opened in LoadVaiTro");
+                }
+
+                // Chuyển container sang XEPDB1
+                using (var cmdSetContainer = new OracleCommand("ALTER SESSION SET CONTAINER = XEPDB1", conn))
+                {
+                    cmdSetContainer.ExecuteNonQuery();
+                    Debug.WriteLine("Container set to XEPDB1 in LoadVaiTro");
+                }
+
+                using (var cmd = new OracleCommand("SELECT VAITRO FROM SYSTEM.VW_NHANVIEN_NVCB WHERE MANV = :username", conn))
                 {
                     cmd.Parameters.Add(new OracleParameter("username", username));
                     object result = cmd.ExecuteScalar();
@@ -52,8 +74,16 @@ namespace OracleAdminWinForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Không thể xác định vai trò người dùng: " + ex.Message);
+                MessageBox.Show("Không thể xác định vai trò người dùng: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 vaitro = "NVCB";
+            }
+            finally
+            {
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                    Debug.WriteLine("Connection closed in LoadVaiTro");
+                }
             }
             Debug.WriteLine("LoadVaiTro completed");
         }
@@ -61,7 +91,7 @@ namespace OracleAdminWinForms
         private void LoadNhanVienData()
         {
             Debug.WriteLine("LoadNhanVienData started");
-            string query = "SELECT MANV, HOTEN, PHAI, NGSINH, ĐT FROM NHANVIEN WHERE MANV = :username";
+            string query = "SELECT MANV, HOTEN, PHAI, NGSINH, ĐT FROM SYSTEM.VW_NHANVIEN_NVCB WHERE MANV = :username";
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = conn;
             cmd.CommandText = query;
@@ -69,6 +99,19 @@ namespace OracleAdminWinForms
 
             try
             {
+                if (conn.State != ConnectionState.Open)
+                {
+                    conn.Open();
+                    Debug.WriteLine("Connection opened in LoadNhanVienData");
+                }
+
+                // Chuyển container sang XEPDB1
+                using (var cmdSetContainer = new OracleCommand("ALTER SESSION SET CONTAINER = XEPDB1", conn))
+                {
+                    cmdSetContainer.ExecuteNonQuery();
+                    Debug.WriteLine("Container set to XEPDB1 in LoadNhanVienData");
+                }
+
                 OracleDataAdapter adapter = new OracleDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 adapter.Fill(dt);
@@ -96,72 +139,72 @@ namespace OracleAdminWinForms
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi tải dữ liệu nhân viên: " + ex.Message);
-            }
-            Debug.WriteLine("LoadNhanVienData completed");
-        }
-
-        private void btnCapNhatSDT_Click(object sender, EventArgs e)
-        {
-            Debug.WriteLine("btnCapNhatSDT_Click started");
-            string newPhone = txtSoDienThoai.Text.Trim();
-
-            if (string.IsNullOrEmpty(newPhone))
-            {
-                MessageBox.Show("Vui lòng nhập số điện thoại mới.");
-                return;
-            }
-
-            try
-            {
-                // Kiểm tra trạng thái kết nối
-                if (conn.State != ConnectionState.Open)
-                {
-                    conn.Open();
-                    Debug.WriteLine("Connection reopened");
-                }
-
-                // Kích hoạt ROLE_NVCB trong session
-                using (var cmdSetRole = new OracleCommand("SET ROLE ROLE_NVCB", conn))
-                {
-                    cmdSetRole.ExecuteNonQuery();
-                    Debug.WriteLine("ROLE_NVCB activated");
-                }
-
-                // Chỉ cập nhật số điện thoại của user hiện tại
-                using (var cmd = new OracleCommand("UPDATE NHANVIEN SET ĐT = :sdt WHERE MANV = :username", conn))
-                {
-                    cmd.Parameters.Add("sdt", newPhone);
-                    cmd.Parameters.Add("username", username);
-                    cmd.CommandTimeout = 30; // Đặt timeout 30 giây
-                    int rows = cmd.ExecuteNonQuery();
-                    Debug.WriteLine($"Rows updated: {rows}");
-                    if (rows > 0)
-                    {
-                        MessageBox.Show("Cập nhật số điện thoại thành công!");
-                        // Sử dụng timer để làm mới giao diện
-                        refreshTimer.Start();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Không tìm thấy nhân viên.");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lỗi khi cập nhật số điện thoại: " + ex.Message);
+                MessageBox.Show("Lỗi tải dữ liệu nhân viên: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
                 if (conn.State == ConnectionState.Open)
                 {
                     conn.Close();
-                    Debug.WriteLine("Connection closed");
+                    Debug.WriteLine("Connection closed in LoadNhanVienData");
                 }
             }
+            Debug.WriteLine("LoadNhanVienData completed");
+        }
+
+        private async void btnCapNhatSDT_Click(object sender, EventArgs e)
+        {
+            Debug.WriteLine("btnCapNhatSDT_Click started");
+            string newPhone = txtSoDienThoai.Text.Trim();
+
+            if (string.IsNullOrEmpty(newPhone))
+            {
+                MessageBox.Show("Vui lòng nhập số điện thoại mới.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                // Đảm bảo kết nối đã mở từ khi khởi tạo form
+                if (conn.State != ConnectionState.Open)
+                {
+                    conn.Open();
+                    Debug.WriteLine("Connection opened in btnCapNhatSDT_Click");
+                }
+
+                // Kích hoạt vai trò ROLE_NVCB (nếu cần thiết)
+                using (var cmdSetRole = new OracleCommand("SET ROLE ROLE_NVCB", conn))
+                {
+                    await cmdSetRole.ExecuteNonQueryAsync();
+                    Debug.WriteLine("ROLE_NVCB activated");
+                }
+
+                // Gọi stored procedure hoặc dùng lệnh SQL trực tiếp
+                using (var cmd = new OracleCommand("SYSTEM.UPDATE_NHANVIEN_DT", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("p_manv", OracleDbType.Varchar2).Value = username;
+                    cmd.Parameters.Add("p_dt", OracleDbType.Varchar2).Value = newPhone;
+                    cmd.CommandTimeout = 120;
+                    await cmd.ExecuteNonQueryAsync();
+                    Debug.WriteLine("Stored procedure SYSTEM.UPDATE_NHANVIEN_DT executed successfully");
+                }
+
+                // Không thực hiện COMMIT theo yêu cầu của bạn
+
+                // Làm mới giao diện trực tiếp thay vì dùng timer
+                MessageBox.Show("Cập nhật số điện thoại thành công !", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadNhanVienData(); // Gọi trực tiếp thay vì dùng timer
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi cập nhật số điện thoại: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            // Không đóng kết nối ở đây, để đóng khi form đóng
             Debug.WriteLine("btnCapNhatSDT_Click completed");
         }
+
+
 
         private void btnTaiLai_Click(object sender, EventArgs e)
         {

@@ -20,6 +20,21 @@ namespace OracleAdminWinForms
 
         private void FormTRGDV_XemNhanVien_Load(object sender, EventArgs e)
         {
+            // Kiểm tra và mở kết nối nếu cần
+            if (conn.State != ConnectionState.Open)
+            {
+                try
+                {
+                    conn.Open();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Không thể mở kết nối: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.Close();
+                    return;
+                }
+            }
+
             LoadVaiTro();
             lblUserInfo.Text = $"Đăng nhập: {username} | Vai trò: {vaitro}";
 
@@ -38,7 +53,7 @@ namespace OracleAdminWinForms
         {
             try
             {
-                using (var cmd = new OracleCommand("SELECT VAITRO FROM NHANVIEN WHERE UPPER(MANV) = :username", conn))
+                using (var cmd = new OracleCommand("SELECT VAITRO FROM VW_NHANVIEN_NVCB WHERE MANV = :username", conn))
                 {
                     cmd.Parameters.Add(new OracleParameter("username", username));
                     object result = cmd.ExecuteScalar();
@@ -54,12 +69,7 @@ namespace OracleAdminWinForms
 
         private void LoadNhanVienData()
         {
-            string query = @"SELECT MANV, HOTEN, PHAI, NGSINH, ĐT, VAITRO 
-                            FROM NHANVIEN 
-                            WHERE MAĐV = (
-                                SELECT MAĐV FROM NHANVIEN WHERE MANV = :username
-                            ) 
-                            AND MANV != :username";
+            string query = @"SELECT * FROM VW_NHANVIEN_TRGDV WHERE MANV != :username";
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = conn;
             cmd.CommandText = query;

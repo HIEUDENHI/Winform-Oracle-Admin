@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Diagnostics;
 using System.Windows.Forms;
 using Oracle.ManagedDataAccess.Client;
 
@@ -47,18 +48,20 @@ namespace OracleAdminWinForms
         {
             try
             {
-                if (dgvSinhVien.Rows.Count == 0) return;
+                if (conn.State != ConnectionState.Open)
+                {
+                    conn.Open();  // Mở kết nối nếu chưa mở
+                    Debug.WriteLine("Connection opened in btnThem_Click");
+                }
 
-                DataGridViewRow row = dgvSinhVien.Rows[dgvSinhVien.Rows.Count - 1]; // Dòng cuối
-                string masv = row.Cells["MASV"].Value?.ToString()?.Trim();
-
+                // Kiểm tra xem MASV có trống không
+                string masv = dgvSinhVien.Rows[dgvSinhVien.Rows.Count - 1].Cells["MASV"].Value?.ToString()?.Trim();
                 if (string.IsNullOrEmpty(masv))
                 {
                     MessageBox.Show("Nhập thông tin sinh viên vào dòng trống trước khi nhấn 'Thêm'.");
                     return;
                 }
 
-                // Kiểm tra xem MASV đã tồn tại chưa
                 string checkQuery = "SELECT COUNT(*) FROM SINHVIEN WHERE MASV = :masv";
                 using (var checkCmd = new OracleCommand(checkQuery, conn))
                 {
@@ -71,18 +74,17 @@ namespace OracleAdminWinForms
                     }
                 }
 
-                // INSERT vào DB
                 string sql = @"INSERT INTO SINHVIEN (MASV, HOTEN, PHAI, NGSINH, ĐCHI, ĐT, KHOA)
-                               VALUES (:MASV, :HOTEN, :PHAI, :NGSINH, :DCHI, :DT, :KHOA)";
+                       VALUES (:MASV, :HOTEN, :PHAI, :NGSINH, :DCHI, :DT, :KHOA)";
                 using (var cmd = new OracleCommand(sql, conn))
                 {
                     cmd.Parameters.Add(":MASV", masv);
-                    cmd.Parameters.Add(":HOTEN", row.Cells["HOTEN"].Value?.ToString());
-                    cmd.Parameters.Add(":PHAI", row.Cells["PHAI"].Value?.ToString());
-                    cmd.Parameters.Add(":NGSINH", Convert.ToDateTime(row.Cells["NGSINH"].Value));
-                    cmd.Parameters.Add(":DCHI", row.Cells["ĐCHI"].Value?.ToString());
-                    cmd.Parameters.Add(":DT", row.Cells["ĐT"].Value?.ToString());
-                    cmd.Parameters.Add(":KHOA", row.Cells["KHOA"].Value?.ToString());
+                    cmd.Parameters.Add(":HOTEN", dgvSinhVien.Rows[dgvSinhVien.Rows.Count - 1].Cells["HOTEN"].Value?.ToString());
+                    cmd.Parameters.Add(":PHAI", dgvSinhVien.Rows[dgvSinhVien.Rows.Count - 1].Cells["PHAI"].Value?.ToString());
+                    cmd.Parameters.Add(":NGSINH", Convert.ToDateTime(dgvSinhVien.Rows[dgvSinhVien.Rows.Count - 1].Cells["NGSINH"].Value));
+                    cmd.Parameters.Add(":DCHI", dgvSinhVien.Rows[dgvSinhVien.Rows.Count - 1].Cells["ĐCHI"].Value?.ToString());
+                    cmd.Parameters.Add(":DT", dgvSinhVien.Rows[dgvSinhVien.Rows.Count - 1].Cells["ĐT"].Value?.ToString());
+                    cmd.Parameters.Add(":KHOA", dgvSinhVien.Rows[dgvSinhVien.Rows.Count - 1].Cells["KHOA"].Value?.ToString());
 
                     int result = cmd.ExecuteNonQuery();
                     if (result > 0)
@@ -97,6 +99,7 @@ namespace OracleAdminWinForms
                 MessageBox.Show("Lỗi thêm sinh viên: " + ex.Message);
             }
         }
+
 
         private void btnCapNhat_Click(object sender, EventArgs e)
         {

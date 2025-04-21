@@ -20,6 +20,21 @@ namespace OracleAdminWinForms
 
         private void FormMomon_PDT_FULLCRUD_Load(object sender, EventArgs e)
         {
+            // Kiểm tra và mở kết nối nếu cần
+            if (conn.State != ConnectionState.Open)
+            {
+                try
+                {
+                    conn.Open();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Không thể mở kết nối: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.Close();
+                    return;
+                }
+            }
+
             LoadVaiTro();
             lblUserInfo.Text = $"Đăng nhập: {username} | Vai trò: {vaitro}";
 
@@ -37,7 +52,7 @@ namespace OracleAdminWinForms
         {
             try
             {
-                using (var cmd = new OracleCommand("SELECT VAITRO FROM NHANVIEN WHERE UPPER(MANV) = :username", conn))
+                using (var cmd = new OracleCommand("SELECT VAITRO FROM VW_NHANVIEN_NVCB WHERE MANV = :username", conn))
                 {
                     cmd.Parameters.Add(new OracleParameter("username", username));
                     object result = cmd.ExecuteScalar();
@@ -105,6 +120,11 @@ namespace OracleAdminWinForms
 
             try
             {
+                if (conn.State != ConnectionState.Open)
+                {
+                    conn.Open();
+                }
+
                 string query = @"INSERT INTO VW_MOMON_PDT (MAMM, MAHP, MAGV, HK, NAM)
                                  VALUES (:mamm, :mahp, :magv, :hk, :nam)";
                 using (OracleCommand cmd = new OracleCommand(query, conn))
@@ -134,6 +154,13 @@ namespace OracleAdminWinForms
             {
                 MessageBox.Show("Lỗi khi thêm: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
         }
 
         private void btnCapNhat_Click(object sender, EventArgs e)
@@ -156,6 +183,11 @@ namespace OracleAdminWinForms
 
             try
             {
+                if (conn.State != ConnectionState.Open)
+                {
+                    conn.Open();
+                }
+
                 string query = @"UPDATE VW_MOMON_PDT 
                                  SET MAHP = :mahp, MAGV = :magv
                                  WHERE MAMM = :mamm";
@@ -183,6 +215,13 @@ namespace OracleAdminWinForms
             {
                 MessageBox.Show("Lỗi khi cập nhật: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (conn.State == ConnectionState.Open)
+                {
+                    conn.Close();
+                }
+            }
         }
 
         private void btnXoa_Click(object sender, EventArgs e)
@@ -199,6 +238,11 @@ namespace OracleAdminWinForms
             {
                 try
                 {
+                    if (conn.State != ConnectionState.Open)
+                    {
+                        conn.Open();
+                    }
+
                     using (OracleCommand cmd = new OracleCommand("DELETE FROM VW_MOMON_PDT WHERE MAMM = :mamm", conn))
                     {
                         cmd.Parameters.Add(":mamm", mamm);
@@ -217,6 +261,13 @@ namespace OracleAdminWinForms
                 catch (Exception ex)
                 {
                     MessageBox.Show("Lỗi khi xoá: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    if (conn.State == ConnectionState.Open)
+                    {
+                        conn.Close();
+                    }
                 }
             }
         }

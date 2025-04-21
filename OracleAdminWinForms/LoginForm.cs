@@ -9,7 +9,7 @@ namespace OracleAdminWinForms
         public string Username { get; private set; }
         public string RoleSelected { get; private set; }
         public OracleConnection UserConnection { get; private set; }
-        public string OlsLabel { get; private set; } // Optional: Lưu nhãn OLS nếu cần
+        public string OlsLabel { get; private set; }
 
         public LoginForm()
         {
@@ -21,7 +21,7 @@ namespace OracleAdminWinForms
             cmbRole.Items.Clear();
             cmbRole.Items.AddRange(new string[]
             {
-                "Admin",      // Thêm vai trò Admin
+                "Admin",
                 "NVCB",
                 "GV",
                 "TRGĐV",
@@ -30,7 +30,7 @@ namespace OracleAdminWinForms
                 "NV PĐT",
                 "NV PCTSV",
                 "SV",
-                "OLS_USER"    // Vai trò OLS_USER
+                "OLS_USER"
             });
 
             cmbRole.SelectedIndex = 0;
@@ -39,10 +39,9 @@ namespace OracleAdminWinForms
         private void btnLogin_Click(object sender, EventArgs e)
         {
             string username = txtUsername.Text.Trim();
-            string password = txtPassword.Text;
+            string password = txtPassword.Text.Trim();
             string selectedRole = cmbRole.SelectedItem?.ToString();
 
-            // Lưu thông tin vào thuộc tính của form
             Username = username;
             RoleSelected = selectedRole;
 
@@ -52,31 +51,30 @@ namespace OracleAdminWinForms
                 return;
             }
 
-            // Nếu người dùng chọn vai trò Admin thì dùng đoạn mã đăng nhập sau:
+            // Nếu người dùng chọn vai trò Admin
             if (selectedRole.Equals("Admin", StringComparison.OrdinalIgnoreCase))
             {
                 string connectionString;
-                // Nếu tài khoản là SYS thì thêm tham số DBA Privilege
                 if (username.Equals("sys", StringComparison.OrdinalIgnoreCase))
                 {
-                    connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));DBA Privilege=SYSDBA;";
+                    connectionString = "User Id=sys;Password=" + password + ";Data Source=localhost:1521/XEPDB1;DBA Privilege=SYSDBA";
                 }
                 else
                 {
-                    connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));";
+                    connectionString = "User Id=" + username + ";Password=" + password + ";Data Source=localhost:1521/XEPDB1";
                 }
 
                 try
                 {
                     OracleConnection conn = new OracleConnection(connectionString);
-                    conn.Open(); // Kiểm tra đăng nhập
+                    conn.Open();
                     UserConnection = conn;
                     this.DialogResult = DialogResult.OK;
                     this.Close();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Đăng nhập thất bại: " + ex.Message);
+                    MessageBox.Show("Đăng nhập thất bại: " + ex.Message + "\nStack Trace: " + ex.StackTrace);
                 }
                 return;
             }
@@ -86,20 +84,18 @@ namespace OracleAdminWinForms
                 string connectionString;
                 if (username.Equals("SYS", StringComparison.OrdinalIgnoreCase))
                 {
-                    connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));DBA Privilege=SYSDBA;";
+                    connectionString = "User Id=SYS;Password=" + password + ";Data Source=localhost:1521/XEPDB1;DBA Privilege=SYSDBA";
                 }
                 else
                 {
-                    connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));";
+                    connectionString = "User Id=" + username + ";Password=" + password + ";Data Source=localhost:1521/XEPDB1";
                 }
 
                 try
                 {
                     OracleConnection conn = new OracleConnection(connectionString);
                     conn.Open();
-
                     MessageBox.Show("Đăng nhập thành công với vai trò OLS_USER.");
-
                     UserConnection = conn;
                     this.DialogResult = DialogResult.OK;
                     this.Close();
@@ -114,17 +110,15 @@ namespace OracleAdminWinForms
             else
             {
                 // Đối với các vai trò còn lại: NVCB, GV, TRGĐV, NV PKT, NV TCHC, NV PĐT, NV PCTSV, SV
-                // Chuyển đổi username sang chữ hoa để so sánh
                 username = username.ToUpper();
-
                 string connectionString;
                 if (username.Equals("SYS", StringComparison.OrdinalIgnoreCase))
                 {
-                    connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));DBA Privilege=SYSDBA;";
+                    connectionString = "User Id=SYS;Password=" + password + ";Data Source=localhost:1521/XEPDB1;DBA Privilege=SYSDBA";
                 }
                 else
                 {
-                    connectionString = $"User Id={username};Password={password};Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XEPDB1)));";
+                    connectionString = "User Id=" + username + ";Password=" + password + ";Data Source=localhost:1521/XEPDB1";
                 }
 
                 try
@@ -136,8 +130,7 @@ namespace OracleAdminWinForms
 
                     if (selectedRole.Equals("SV", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Kiểm tra vai trò sinh viên
-                        using (var cmd = new OracleCommand("SELECT 'SV' FROM SYSTEM.SINHVIEN WHERE MASV = :id", conn))
+                        using (var cmd = new OracleCommand("SELECT 'SV' FROM VW_SINHVIEN_SV WHERE MASV = :id", conn))
                         {
                             cmd.Parameters.Add("id", OracleDbType.Varchar2).Value = username;
                             var result = cmd.ExecuteScalar();
@@ -146,8 +139,7 @@ namespace OracleAdminWinForms
                     }
                     else
                     {
-                        // Kiểm tra vai trò nhân viên
-                        using (var cmd = new OracleCommand("SELECT VAITRO FROM SYSTEM.NHANVIEN WHERE MANV = :id", conn))
+                        using (var cmd = new OracleCommand("SELECT VAITRO FROM VW_NHANVIEN_NVCB WHERE MANV = :id", conn))
                         {
                             cmd.Parameters.Add("id", OracleDbType.Varchar2).Value = username;
                             var result = cmd.ExecuteScalar();
@@ -162,7 +154,6 @@ namespace OracleAdminWinForms
                         return;
                     }
 
-                    // So sánh vai trò người dùng chọn với vai trò ghi nhận trong cơ sở dữ liệu
                     if (!vaiTroFromDb.Equals(selectedRole, StringComparison.OrdinalIgnoreCase))
                     {
                         MessageBox.Show($"Bạn chọn vai trò [{selectedRole}], nhưng hệ thống ghi nhận là [{vaiTroFromDb}].");
@@ -181,7 +172,6 @@ namespace OracleAdminWinForms
             }
         }
 
-        // Optional: Phương thức lấy nhãn OLS cho người dùng (nếu cần)
         private string GetOlsLabel(OracleConnection conn, string username)
         {
             try

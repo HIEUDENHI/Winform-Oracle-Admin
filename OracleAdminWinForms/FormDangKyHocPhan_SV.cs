@@ -1,118 +1,233 @@
-﻿using Oracle.ManagedDataAccess.Client;
+﻿using System;
 using System.Data;
 using System.Windows.Forms;
-using System;
+using Oracle.ManagedDataAccess.Client;
 
-public partial class FormDangKyHocPhan_SV : Form
+namespace OracleAdminWinForms
 {
-    private OracleConnection conn;
-    private string username;
-
-    public FormDangKyHocPhan_SV(OracleConnection connection, string username)
+    public partial class FormDangKyHocPhan_SV : Form
     {
-        InitializeComponent();
-        conn = connection;
-        this.username = username;
-    }
+        private OracleConnection conn;
+        private string username;
 
-    private void FormDangKyHocPhan_SV_Load(object sender, EventArgs e)
-    {
-        lblTitle.Text = $"Đăng ký học phần - {username}";
-        LoadData();
-    }
-
-    private void LoadData()
-    {
-        try
+        public FormDangKyHocPhan_SV(OracleConnection connection, string user)
         {
-            string query = "SELECT * FROM DANGKY WHERE MASV = :masv";
-            OracleDataAdapter adapter = new OracleDataAdapter(query, conn);
-            adapter.SelectCommand.Parameters.Add("masv", OracleDbType.Varchar2).Value = username;
+            InitializeComponent();
+            conn = connection;
+            username = user;
 
-            DataTable dt = new DataTable();
-            adapter.Fill(dt);
-            dgvDangKy.DataSource = dt;
+            lblTitle.Text = $"Đăng ký học phần - Sinh viên: {username}";
+            LoadData();
         }
-        catch (Exception ex)
-        {
-            MessageBox.Show("❌ Lỗi tải dữ liệu: " + ex.Message);
-        }
-    }
 
-    private void btnThem_Click(object sender, EventArgs e)
-    {
-        try
+        private void LoadData()
         {
-            string mamm = txtMaMon.Text.Trim().ToUpper();
-            string query = "INSERT INTO DANGKY (MASV, MAMM) VALUES (:masv, :mamm)";
-            using (var cmd = new OracleCommand(query, conn))
+            try
             {
-                cmd.Parameters.Add("masv", OracleDbType.Varchar2).Value = username;
-                cmd.Parameters.Add("mamm", OracleDbType.Varchar2).Value = mamm;
-                cmd.ExecuteNonQuery();
+                string query = "SELECT * FROM DANGKY";
+                OracleDataAdapter adapter = new OracleDataAdapter(query, conn);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+                dgvDangKy.DataSource = dt;
+
+                if (dt.Rows.Count == 0)
+                {
+                    MessageBox.Show("Không có dữ liệu để hiển thị. Có thể bạn đang truy cập ngoài 14 ngày đầu học kỳ hoặc dữ liệu không thỏa mãn điều kiện VPD.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi tải dữ liệu đăng ký: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnTaiLai_Click(object sender, EventArgs e)
+        {
+            LoadData();
+        }
+
+        private void btnThem_Click(object sender, EventArgs e)
+        {
+            using (var inputForm = new Form())
+            {
+                inputForm.Text = "Thêm đăng ký học phần";
+                inputForm.Size = new System.Drawing.Size(300, 200);
+                inputForm.StartPosition = FormStartPosition.CenterParent;
+
+                Label lblMASV = new Label { Text = "Mã sinh viên (MASV):", Location = new System.Drawing.Point(20, 20) };
+                TextBox txtMASV = new TextBox { Location = new System.Drawing.Point(120, 20), Width = 150, Text = username, ReadOnly = true };
+
+                Label lblMAMM = new Label { Text = "Mã môn mở (MAMM):", Location = new System.Drawing.Point(20, 60) };
+                TextBox txtMAMM = new TextBox { Location = new System.Drawing.Point(120, 60), Width = 150 };
+
+                Button btnOK = new Button { Text = "Thêm", Location = new System.Drawing.Point(120, 100), Width = 70 };
+                Button btnCancel = new Button { Text = "Hủy", Location = new System.Drawing.Point(200, 100), Width = 70 };
+
+                btnOK.Click += (s, ev) =>
+                {
+                    string masv = txtMASV.Text.Trim();
+                    string mamm = txtMAMM.Text.Trim();
+
+                    if (string.IsNullOrEmpty(mamm))
+                    {
+                        MessageBox.Show("Vui lòng nhập Mã môn mở!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    try
+                    {
+                        string query = "INSERT INTO DANGKY (MASV, MAMM, ĐIEMTH, ĐIEMQT, ĐIEMCK, ĐIEMTK) " +
+                                       "VALUES (:masv, :mamm, NULL, NULL, NULL, NULL)";
+                        using (OracleCommand cmd = new OracleCommand(query, conn))
+                        {
+                            cmd.Parameters.Add(new OracleParameter("masv", masv));
+                            cmd.Parameters.Add(new OracleParameter("mamm", mamm));
+                            int rowsAffected = cmd.ExecuteNonQuery();
+
+                            if (rowsAffected > 0)
+                            {
+                                MessageBox.Show("Thêm bản ghi thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                LoadData();
+                                inputForm.Close();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Không thể thêm bản ghi. Có thể bạn đang thao tác ngoài 14 ngày đầu học kỳ hoặc môn mở không hợp lệ!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Lỗi khi thêm bản ghi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                };
+
+                btnCancel.Click += (s, ev) => inputForm.Close();
+
+                inputForm.Controls.AddRange(new Control[] { lblMASV, txtMASV, lblMAMM, txtMAMM, btnOK, btnCancel });
+                inputForm.ShowDialog();
+            }
+        }
+
+        private void btnCapNhat_Click(object sender, EventArgs e)
+        {
+            if (dgvDangKy.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Vui lòng chọn một bản ghi để cập nhật!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
 
-            LoadData();
-            MessageBox.Show("✅ Đã thêm đăng ký!");
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show("❌ Lỗi thêm đăng ký: " + ex.Message);
-        }
-    }
+            DataGridViewRow selectedRow = dgvDangKy.SelectedRows[0];
+            string oldMASV = selectedRow.Cells["MASV"].Value.ToString();
+            string oldMAMM = selectedRow.Cells["MAMM"].Value.ToString();
 
-    private void btnXoa_Click(object sender, EventArgs e)
-    {
-        if (dgvDangKy.CurrentRow == null) return;
-        string mamm = dgvDangKy.CurrentRow.Cells["MAMM"].Value.ToString();
-
-        try
-        {
-            string query = "DELETE FROM DANGKY WHERE MASV = :masv AND MAMM = :mamm";
-            using (var cmd = new OracleCommand(query, conn))
+            using (var inputForm = new Form())
             {
-                cmd.Parameters.Add("masv", OracleDbType.Varchar2).Value = username;
-                cmd.Parameters.Add("mamm", OracleDbType.Varchar2).Value = mamm;
-                cmd.ExecuteNonQuery();
+                inputForm.Text = "Cập nhật đăng ký học phần";
+                inputForm.Size = new System.Drawing.Size(300, 200);
+                inputForm.StartPosition = FormStartPosition.CenterParent;
+
+                Label lblMASV = new Label { Text = "Mã sinh viên (MASV):", Location = new System.Drawing.Point(20, 20) };
+                TextBox txtMASV = new TextBox { Location = new System.Drawing.Point(120, 20), Width = 150, Text = oldMASV, ReadOnly = true };
+
+                Label lblMAMM = new Label { Text = "Mã môn mở (MAMM):", Location = new System.Drawing.Point(20, 60) };
+                TextBox txtMAMM = new TextBox { Location = new System.Drawing.Point(120, 60), Width = 150, Text = oldMAMM };
+
+                Button btnOK = new Button { Text = "Cập nhật", Location = new System.Drawing.Point(120, 100), Width = 70 };
+                Button btnCancel = new Button { Text = "Hủy", Location = new System.Drawing.Point(200, 100), Width = 70 };
+
+                btnOK.Click += (s, ev) =>
+                {
+                    string newMASV = txtMASV.Text.Trim();
+                    string newMAMM = txtMAMM.Text.Trim();
+
+                    if (string.IsNullOrEmpty(newMAMM))
+                    {
+                        MessageBox.Show("Vui lòng nhập Mã môn mở!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    try
+                    {
+                        string query = "UPDATE DANGKY SET MAMM = :newMAMM " +
+                                       "WHERE MASV = :oldMASV AND MAMM = :oldMAMM";
+                        using (OracleCommand cmd = new OracleCommand(query, conn))
+                        {
+                            cmd.Parameters.Add(new OracleParameter("newMAMM", newMAMM));
+                            cmd.Parameters.Add(new OracleParameter("oldMASV", oldMASV));
+                            cmd.Parameters.Add(new OracleParameter("oldMAMM", oldMAMM));
+                            int rowsAffected = cmd.ExecuteNonQuery();
+
+                            if (rowsAffected > 0)
+                            {
+                                MessageBox.Show("Cập nhật bản ghi thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                LoadData();
+                                inputForm.Close();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Không thể cập nhật bản ghi. Có thể bạn đang thao tác ngoài 14 ngày đầu học kỳ hoặc bản ghi không thỏa mãn điều kiện VPD!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Lỗi khi cập nhật bản ghi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                };
+
+                btnCancel.Click += (s, ev) => inputForm.Close();
+
+                inputForm.Controls.AddRange(new Control[] { lblMASV, txtMASV, lblMAMM, txtMAMM, btnOK, btnCancel });
+                inputForm.ShowDialog();
+            }
+        }
+
+        private void btnXoa_Click(object sender, EventArgs e)
+        {
+            if (dgvDangKy.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Vui lòng chọn một bản ghi để xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
 
-            LoadData();
-            MessageBox.Show("✅ Đã xoá đăng ký!");
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show("❌ Lỗi xoá: " + ex.Message);
-        }
-    }
+            DataGridViewRow selectedRow = dgvDangKy.SelectedRows[0];
+            string masv = selectedRow.Cells["MASV"].Value.ToString();
+            string mamm = selectedRow.Cells["MAMM"].Value.ToString();
 
-    private void btnCapNhat_Click(object sender, EventArgs e)
-    {
-        if (dgvDangKy.CurrentRow == null) return;
-        string mammCu = dgvDangKy.CurrentRow.Cells["MAMM"].Value.ToString();
-        string mammMoi = txtMaMon.Text.Trim().ToUpper();
+            DialogResult result = MessageBox.Show($"Bạn có chắc chắn muốn xóa bản ghi với MASV = {masv} và MAMM = {mamm}?", "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.No)
+                return;
 
-        try
-        {
-            string query = "UPDATE DANGKY SET MAMM = :mammMoi WHERE MASV = :masv AND MAMM = :mammCu";
-            using (var cmd = new OracleCommand(query, conn))
+            try
             {
-                cmd.Parameters.Add("mammMoi", OracleDbType.Varchar2).Value = mammMoi;
-                cmd.Parameters.Add("masv", OracleDbType.Varchar2).Value = username;
-                cmd.Parameters.Add("mammCu", OracleDbType.Varchar2).Value = mammCu;
-                cmd.ExecuteNonQuery();
+                string query = "DELETE FROM DANGKY WHERE MASV = :masv AND MAMM = :mamm";
+                using (OracleCommand cmd = new OracleCommand(query, conn))
+                {
+                    cmd.Parameters.Add(new OracleParameter("masv", masv));
+                    cmd.Parameters.Add(new OracleParameter("mamm", mamm));
+                    int rowsAffected = cmd.ExecuteNonQuery();
+
+                    if (rowsAffected > 0)
+                    {
+                        MessageBox.Show("Xóa bản ghi thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        LoadData();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Không thể xóa bản ghi. Có thể bạn đang thao tác ngoài 14 ngày đầu học kỳ hoặc bản ghi không thỏa mãn điều kiện VPD!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
             }
-
-            LoadData();
-            MessageBox.Show("✅ Đã cập nhật đăng ký!");
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi khi xóa bản ghi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
-        catch (Exception ex)
+
+        private void FormDangKyHocPhan_SV_Load(object sender, EventArgs e)
         {
-            MessageBox.Show("❌ Lỗi cập nhật: " + ex.Message);
+            LoadData();
         }
-    }
-
-    private void btnTaiLai_Click(object sender, EventArgs e)
-    {
-        LoadData();
     }
 }

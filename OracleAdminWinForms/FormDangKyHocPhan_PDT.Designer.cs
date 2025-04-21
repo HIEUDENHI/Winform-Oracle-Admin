@@ -28,70 +28,68 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvDangKy)).BeginInit();
             this.SuspendLayout();
 
-            // 
             // lblTitle
-            // 
             this.lblTitle.AutoSize = true;
-            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.lblTitle.Location = new System.Drawing.Point(20, 15);
-            this.lblTitle.Text = "Quản lý đăng ký học phần - NV PĐT";
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(200, 23);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "Đăng ký học phần - NV PĐT: [username]";
 
-            // 
             // dgvDangKy
-            // 
-            this.dgvDangKy.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                                          | System.Windows.Forms.AnchorStyles.Left)
-                                          | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvDangKy.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvDangKy.Location = new System.Drawing.Point(20, 60);
+            this.dgvDangKy.Location = new System.Drawing.Point(20, 50);
             this.dgvDangKy.Name = "dgvDangKy";
-            this.dgvDangKy.Size = new System.Drawing.Size(760, 320);
+            this.dgvDangKy.RowHeadersWidth = 51;
+            this.dgvDangKy.RowTemplate.Height = 24;
+            this.dgvDangKy.Size = new System.Drawing.Size(900, 350);
+            this.dgvDangKy.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
 
-            // 
-            // btnThem
-            // 
-            this.btnThem.Location = new System.Drawing.Point(20, 400);
-            this.btnThem.Size = new System.Drawing.Size(90, 30);
-            this.btnThem.Text = "Thêm";
-            this.btnThem.Click += new System.EventHandler(this.btnThem_Click);
-
-            // 
-            // btnCapNhat
-            // 
-            this.btnCapNhat.Location = new System.Drawing.Point(120, 400);
-            this.btnCapNhat.Size = new System.Drawing.Size(90, 30);
-            this.btnCapNhat.Text = "Cập nhật";
-            this.btnCapNhat.Click += new System.EventHandler(this.btnCapNhat_Click);
-
-            // 
-            // btnXoa
-            // 
-            this.btnXoa.Location = new System.Drawing.Point(220, 400);
-            this.btnXoa.Size = new System.Drawing.Size(90, 30);
-            this.btnXoa.Text = "Xóa";
-            this.btnXoa.Click += new System.EventHandler(this.btnXoa_Click);
-
-            // 
             // btnTaiLai
-            // 
-            this.btnTaiLai.Location = new System.Drawing.Point(320, 400);
-            this.btnTaiLai.Size = new System.Drawing.Size(90, 30);
+            this.btnTaiLai.Location = new System.Drawing.Point(20, 420);
+            this.btnTaiLai.Name = "btnTaiLai";
+            this.btnTaiLai.Size = new System.Drawing.Size(100, 30);
             this.btnTaiLai.Text = "Tải lại";
+            this.btnTaiLai.UseVisualStyleBackColor = true;
             this.btnTaiLai.Click += new System.EventHandler(this.btnTaiLai_Click);
 
-            // 
+            // btnThem
+            this.btnThem.Location = new System.Drawing.Point(140, 420);
+            this.btnThem.Name = "btnThem";
+            this.btnThem.Size = new System.Drawing.Size(100, 30);
+            this.btnThem.Text = "Thêm";
+            this.btnThem.UseVisualStyleBackColor = true;
+            this.btnThem.Click += new System.EventHandler(this.btnThem_Click);
+
+            // btnCapNhat
+            this.btnCapNhat.Location = new System.Drawing.Point(260, 420);
+            this.btnCapNhat.Name = "btnCapNhat";
+            this.btnCapNhat.Size = new System.Drawing.Size(100, 30);
+            this.btnCapNhat.Text = "Cập nhật";
+            this.btnCapNhat.UseVisualStyleBackColor = true;
+            this.btnCapNhat.Click += new System.EventHandler(this.btnCapNhat_Click);
+
+            // btnXoa
+            this.btnXoa.Location = new System.Drawing.Point(380, 420);
+            this.btnXoa.Name = "btnXoa";
+            this.btnXoa.Size = new System.Drawing.Size(100, 30);
+            this.btnXoa.Text = "Xóa";
+            this.btnXoa.UseVisualStyleBackColor = true;
+            this.btnXoa.Click += new System.EventHandler(this.btnXoa_Click);
+
             // FormDangKyHocPhan_PDT
-            // 
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(950, 480);
             this.Controls.Add(this.lblTitle);
             this.Controls.Add(this.dgvDangKy);
+            this.Controls.Add(this.btnTaiLai);
             this.Controls.Add(this.btnThem);
             this.Controls.Add(this.btnCapNhat);
             this.Controls.Add(this.btnXoa);
-            this.Controls.Add(this.btnTaiLai);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "FormDangKyHocPhan_PDT";
             this.Text = "Đăng ký học phần - PĐT";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Load += new System.EventHandler(this.FormDangKyHocPhan_PDT_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvDangKy)).EndInit();
             this.ResumeLayout(false);

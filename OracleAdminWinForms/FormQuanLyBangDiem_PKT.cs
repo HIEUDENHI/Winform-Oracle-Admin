@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Diagnostics;
 using System.Windows.Forms;
 using Oracle.ManagedDataAccess.Client;
 
@@ -45,43 +46,53 @@ namespace OracleAdminWinForms
         {
             try
             {
-                // Duyệt qua các dòng trong DataGridView để cập nhật điểm
-                foreach (DataGridViewRow row in dgvBangDiem.Rows)
+                // Kiểm tra kết nối
+                if (conn.State != ConnectionState.Open)
                 {
-                    if (row.IsNewRow) continue;
+                    conn.Open();  // Mở kết nối nếu chưa mở
+                    Debug.WriteLine("Connection opened in btnCapNhat_Click");
+                }
 
-                    // Kiểm tra giá trị MASV và MAMM
+                // Kiểm tra xem có dòng nào được chọn không
+                if (dgvBangDiem.SelectedRows.Count == 0)
+                {
+                    MessageBox.Show("Vui lòng chọn ít nhất một dòng để cập nhật điểm!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                bool hasUpdated = false; // Biến để kiểm tra xem có dòng nào được cập nhật không
+
+                // Duyệt qua các dòng được chọn trong DataGridView
+                foreach (DataGridViewRow row in dgvBangDiem.SelectedRows)
+                {
                     string masv = row.Cells["MASV"].Value?.ToString();
                     string mamm = row.Cells["MAMM"].Value?.ToString();
 
-                    // Kiểm tra nếu MASV hoặc MAMM là null hoặc rỗng
                     if (string.IsNullOrEmpty(masv) || string.IsNullOrEmpty(mamm))
                     {
-                        MessageBox.Show("MASV hoặc MAMM không hợp lệ.");
+                        MessageBox.Show($"Dòng với MASV = {masv} và MAMM = {mamm} không hợp lệ.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
 
-                    // Kiểm tra điểm (dùng tên đúng của cột)
-                    object diemth = row.Cells["ĐIEMTH"].Value;
-                    object diemqt = row.Cells["ĐIEMQT"].Value;
-                    object diemck = row.Cells["ĐIEMCK"].Value;
-                    object diemtk = row.Cells["ĐIEMTK"].Value;
+                    // Lấy giá trị điểm từ các cột
+                    string diemthStr = row.Cells["ĐIEMTH"].Value?.ToString();
+                    string diemqtStr = row.Cells["ĐIEMQT"].Value?.ToString();
+                    string diemckStr = row.Cells["ĐIEMCK"].Value?.ToString();
+                    string diemtkStr = row.Cells["ĐIEMTK"].Value?.ToString();
 
-                    // Kiểm tra xem các giá trị điểm có hợp lệ không
-                    if (diemth == DBNull.Value || diemqt == DBNull.Value || diemck == DBNull.Value || diemtk == DBNull.Value)
+                    if (string.IsNullOrEmpty(diemthStr) || string.IsNullOrEmpty(diemqtStr) ||
+                        string.IsNullOrEmpty(diemckStr) || string.IsNullOrEmpty(diemtkStr))
                     {
-                        MessageBox.Show("Điểm phải được nhập đầy đủ.");
+                        MessageBox.Show($"Dòng với MASV = {masv} và MAMM = {mamm}: Điểm phải được nhập đầy đủ.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
 
-                    // Chuyển đổi điểm sang kiểu số để kiểm tra tính hợp lệ
-                    decimal diemTHValue, diemQTValue, diemCKValue, diemTKValue;
-                    if (!decimal.TryParse(diemth.ToString(), out diemTHValue) ||
-                        !decimal.TryParse(diemqt.ToString(), out diemQTValue) ||
-                        !decimal.TryParse(diemck.ToString(), out diemCKValue) ||
-                        !decimal.TryParse(diemtk.ToString(), out diemTKValue))
+                    if (!decimal.TryParse(diemthStr, out decimal diemTHValue) ||
+                        !decimal.TryParse(diemqtStr, out decimal diemQTValue) ||
+                        !decimal.TryParse(diemckStr, out decimal diemCKValue) ||
+                        !decimal.TryParse(diemtkStr, out decimal diemTKValue))
                     {
-                        MessageBox.Show("Điểm phải là giá trị hợp lệ.");
+                        MessageBox.Show($"Dòng với MASV = {masv} và MAMM = {mamm}: Điểm phải là giá trị hợp lệ.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
 
@@ -97,20 +108,30 @@ namespace OracleAdminWinForms
                         cmd.Parameters.Add("masv", OracleDbType.Varchar2).Value = masv;
                         cmd.Parameters.Add("mamm", OracleDbType.Varchar2).Value = mamm;
 
-                        cmd.ExecuteNonQuery();
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            hasUpdated = true;
+                        }
                     }
                 }
 
-                // Sau khi cập nhật xong, tải lại dữ liệu
                 LoadData();
-                MessageBox.Show("Bảng điểm đã được cập nhật thành công!");
+
+                if (hasUpdated)
+                {
+                    MessageBox.Show("Bảng điểm đã được cập nhật thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Không có dòng nào được cập nhật.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi khi cập nhật bảng điểm: " + ex.Message);
+                MessageBox.Show("Lỗi khi cập nhật bảng điểm: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
 
 
         private void FormQuanLyBangDiem_PKT_Load(object sender, EventArgs e)

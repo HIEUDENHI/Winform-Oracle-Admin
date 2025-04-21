@@ -1,92 +1,99 @@
-﻿using System.Drawing;
-using System.Windows.Forms;
-using System;
-
-partial class FormDangKyHocPhan_SV
+﻿namespace OracleAdminWinForms
 {
-    private System.ComponentModel.IContainer components = null;
-    private DataGridView dgvDangKy;
-    private Button btnThem;
-    private Button btnXoa;
-    private Button btnCapNhat;
-    private Button btnTaiLai;
-    private Label lblTitle;
-    private TextBox txtMaMon;
-
-    protected override void Dispose(bool disposing)
+    partial class FormDangKyHocPhan_SV
     {
-        if (disposing && components != null)
-            components.Dispose();
-        base.Dispose(disposing);
-    }
+        private System.ComponentModel.IContainer components = null;
+        private System.Windows.Forms.Label lblTitle;
+        private System.Windows.Forms.DataGridView dgvDangKy;
+        private System.Windows.Forms.Button btnThem;
+        private System.Windows.Forms.Button btnCapNhat;
+        private System.Windows.Forms.Button btnXoa;
+        private System.Windows.Forms.Button btnTaiLai;
 
-    private void InitializeComponent()
-    {
-        this.dgvDangKy = new DataGridView();
-        this.btnThem = new Button();
-        this.btnXoa = new Button();
-        this.btnCapNhat = new Button();
-        this.btnTaiLai = new Button();
-        this.lblTitle = new Label();
-        this.txtMaMon = new TextBox();
-
-        this.SuspendLayout();
-
-        this.lblTitle.AutoSize = true;
-        this.lblTitle.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
-        this.lblTitle.Location = new Point(20, 20);
-        this.lblTitle.Text = "Đăng ký học phần";
-
-        this.dgvDangKy.Location = new Point(20, 60);
-        this.dgvDangKy.Size = new Size(740, 300);
-        this.dgvDangKy.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-        this.txtMaMon.Location = new Point(20, 370);
-        this.txtMaMon.Size = new Size(200, 27);
-        this.txtMaMon.Text = "Nhập mã môn...";
-        this.txtMaMon.ForeColor = Color.Gray;
-        this.txtMaMon.GotFocus += (s, e) =>
+        protected override void Dispose(bool disposing)
         {
-            if (txtMaMon.Text == "Nhập mã môn...")
-            {
-                txtMaMon.Text = "";
-                txtMaMon.ForeColor = Color.Black;
-            }
-        };
-        this.txtMaMon.LostFocus += (s, e) =>
+            if (disposing && (components != null))
+                components.Dispose();
+            base.Dispose(disposing);
+        }
+
+        private void InitializeComponent()
         {
-            if (string.IsNullOrWhiteSpace(txtMaMon.Text))
-            {
-                txtMaMon.Text = "Nhập mã môn...";
-                txtMaMon.ForeColor = Color.Gray;
-            }
-        };
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.dgvDangKy = new System.Windows.Forms.DataGridView();
+            this.btnThem = new System.Windows.Forms.Button();
+            this.btnCapNhat = new System.Windows.Forms.Button();
+            this.btnXoa = new System.Windows.Forms.Button();
+            this.btnTaiLai = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvDangKy)).BeginInit();
+            this.SuspendLayout();
 
-        this.btnThem.Text = "Thêm";
-        this.btnThem.Location = new Point(240, 370);
-        this.btnThem.Click += new EventHandler(this.btnThem_Click);
+            // lblTitle
+            this.lblTitle.AutoSize = true;
+            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
+            this.lblTitle.Location = new System.Drawing.Point(20, 15);
+            this.lblTitle.Name = "lblTitle";
+            this.lblTitle.Size = new System.Drawing.Size(200, 23);
+            this.lblTitle.TabIndex = 0;
+            this.lblTitle.Text = "Đăng ký học phần - Sinh viên";
 
-        this.btnXoa.Text = "Xoá";
-        this.btnXoa.Location = new Point(340, 370);
-        this.btnXoa.Click += new EventHandler(this.btnXoa_Click);
+            // dgvDangKy
+            this.dgvDangKy.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvDangKy.Location = new System.Drawing.Point(20, 50);
+            this.dgvDangKy.Name = "dgvDangKy";
+            this.dgvDangKy.RowHeadersWidth = 51;
+            this.dgvDangKy.RowTemplate.Height = 24;
+            this.dgvDangKy.Size = new System.Drawing.Size(900, 350);
+            this.dgvDangKy.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
 
-        this.btnCapNhat.Text = "Cập nhật";
-        this.btnCapNhat.Location = new Point(440, 370);
-        this.btnCapNhat.Click += new EventHandler(this.btnCapNhat_Click);
+            // btnTaiLai
+            this.btnTaiLai.Location = new System.Drawing.Point(20, 420);
+            this.btnTaiLai.Name = "btnTaiLai";
+            this.btnTaiLai.Size = new System.Drawing.Size(100, 30);
+            this.btnTaiLai.Text = "Tải lại";
+            this.btnTaiLai.UseVisualStyleBackColor = true;
+            this.btnTaiLai.Click += new System.EventHandler(this.btnTaiLai_Click);
 
-        this.btnTaiLai.Text = "Tải lại";
-        this.btnTaiLai.Location = new Point(540, 370);
-        this.btnTaiLai.Click += new EventHandler(this.btnTaiLai_Click);
+            // btnThem
+            this.btnThem.Location = new System.Drawing.Point(140, 420);
+            this.btnThem.Name = "btnThem";
+            this.btnThem.Size = new System.Drawing.Size(100, 30);
+            this.btnThem.Text = "Thêm";
+            this.btnThem.UseVisualStyleBackColor = true;
+            this.btnThem.Click += new System.EventHandler(this.btnThem_Click);
 
-        this.ClientSize = new Size(800, 420);
-        this.Controls.AddRange(new Control[] {
-            lblTitle, dgvDangKy, txtMaMon, btnThem, btnXoa, btnCapNhat, btnTaiLai
-        });
+            // btnCapNhat
+            this.btnCapNhat.Location = new System.Drawing.Point(260, 420);
+            this.btnCapNhat.Name = "btnCapNhat";
+            this.btnCapNhat.Size = new System.Drawing.Size(100, 30);
+            this.btnCapNhat.Text = "Cập nhật";
+            this.btnCapNhat.UseVisualStyleBackColor = true;
+            this.btnCapNhat.Click += new System.EventHandler(this.btnCapNhat_Click);
 
-        this.Text = "Đăng ký học phần - Sinh viên";
-        this.Load += new EventHandler(this.FormDangKyHocPhan_SV_Load);
+            // btnXoa
+            this.btnXoa.Location = new System.Drawing.Point(380, 420);
+            this.btnXoa.Name = "btnXoa";
+            this.btnXoa.Size = new System.Drawing.Size(100, 30);
+            this.btnXoa.Text = "Xóa";
+            this.btnXoa.UseVisualStyleBackColor = true;
+            this.btnXoa.Click += new System.EventHandler(this.btnXoa_Click);
 
-        this.ResumeLayout(false);
-        this.PerformLayout();
+            // FormDangKyHocPhan_SV
+            this.ClientSize = new System.Drawing.Size(950, 480);
+            this.Controls.Add(this.lblTitle);
+            this.Controls.Add(this.dgvDangKy);
+            this.Controls.Add(this.btnTaiLai);
+            this.Controls.Add(this.btnThem);
+            this.Controls.Add(this.btnCapNhat);
+            this.Controls.Add(this.btnXoa);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Name = "FormDangKyHocPhan_SV";
+            this.Text = "Đăng ký học phần - Sinh viên";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Load += new System.EventHandler(this.FormDangKyHocPhan_SV_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvDangKy)).EndInit();
+            this.ResumeLayout(false);
+            this.PerformLayout();
+        }
     }
 }
