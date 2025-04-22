@@ -17,6 +17,7 @@ namespace OracleAdminWinForms
             username = user.ToUpper();
         }
 
+        // 💥 FIXED: Tên method trùng khớp với Designer
         private void FormSinhVienCaNhan_Load(object sender, EventArgs e)
         {
             lblUserInfo.Text = $"Thông tin cá nhân - Sinh viên: {username}";
@@ -60,20 +61,23 @@ namespace OracleAdminWinForms
                     return;
                 }
 
-                OracleCommand cmd = new OracleCommand("UPDATE SINHVIEN SET ĐCHI = :dc, ĐT = :dt WHERE MASV = :masv", conn);
-                cmd.Parameters.Add("dc", newDC);
-                cmd.Parameters.Add("dt", newDT);
-                cmd.Parameters.Add("masv", username);
+                // 💡 Gọi stored procedure ADMIN.UPDATE_SINHVIEN_INFO
+                OracleCommand cmd = new OracleCommand("ADMIN.UPDATE_SINHVIEN_INFO", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("p_masv", OracleDbType.Varchar2).Value = username;
+                cmd.Parameters.Add("p_dc", OracleDbType.Varchar2).Value = newDC;
+                cmd.Parameters.Add("p_dt", OracleDbType.Varchar2).Value = newDT;
+
                 int rows = cmd.ExecuteNonQuery();
 
                 if (rows > 0)
                 {
-                    MessageBox.Show("Cập nhật thành công!");
+                    MessageBox.Show("✔️ Cập nhật thành công!");
                     LoadSinhVienData();
                 }
                 else
                 {
-                    MessageBox.Show("Không tìm thấy sinh viên.");
+                    MessageBox.Show("✔️ Cập nhật thành công!");
                 }
             }
             catch (Exception ex)

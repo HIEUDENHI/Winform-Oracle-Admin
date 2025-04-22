@@ -65,7 +65,7 @@ namespace OracleAdminWinForms
                     Debug.WriteLine("Container set to XEPDB1 in LoadVaiTro");
                 }
 
-                using (var cmd = new OracleCommand("SELECT VAITRO FROM SYSTEM.VW_NHANVIEN_NVCB WHERE MANV = :username", conn))
+                using (var cmd = new OracleCommand("SELECT VAITRO FROM ADMIN.VW_NHANVIEN_NVCB WHERE MANV = :username", conn))
                 {
                     cmd.Parameters.Add(new OracleParameter("username", username));
                     object result = cmd.ExecuteScalar();
@@ -91,7 +91,7 @@ namespace OracleAdminWinForms
         private void LoadNhanVienData()
         {
             Debug.WriteLine("LoadNhanVienData started");
-            string query = "SELECT MANV, HOTEN, PHAI, NGSINH, ĐT FROM SYSTEM.VW_NHANVIEN_NVCB WHERE MANV = :username";
+            string query = "SELECT MANV, HOTEN, PHAI, NGSINH, ĐT FROM ADMIN.VW_NHANVIEN_NVCB WHERE MANV = :username";
             OracleCommand cmd = new OracleCommand();
             cmd.Connection = conn;
             cmd.CommandText = query;
@@ -180,14 +180,14 @@ namespace OracleAdminWinForms
                 }
 
                 // Gọi stored procedure hoặc dùng lệnh SQL trực tiếp
-                using (var cmd = new OracleCommand("SYSTEM.UPDATE_NHANVIEN_DT", conn))
+                using (var cmd = new OracleCommand("ADMIN.UPDATE_NHANVIEN_DT", conn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add("p_manv", OracleDbType.Varchar2).Value = username;
                     cmd.Parameters.Add("p_dt", OracleDbType.Varchar2).Value = newPhone;
                     cmd.CommandTimeout = 120;
                     await cmd.ExecuteNonQueryAsync();
-                    Debug.WriteLine("Stored procedure SYSTEM.UPDATE_NHANVIEN_DT executed successfully");
+                    Debug.WriteLine("Stored procedure ADMIN.UPDATE_NHANVIEN_DT executed successfully");
                 }
 
                 // Không thực hiện COMMIT theo yêu cầu của bạn
